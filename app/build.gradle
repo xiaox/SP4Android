@@ -19,6 +19,10 @@ android {
     }
 }
 
+repositories {
+    maven { url 'https://dl.bintray.com/alexeydanilov/maven' }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -29,4 +33,11 @@ dependencies {
         exclude group: 'com.google.android'
     }
     compile 'com.android.support:appcompat-v7:23.3.0'
+
+    testCompile 'org.robolectric:robolectric:3.1.2'
+    testCompile("com.danikula:android-garden:2.1.4") {
+        exclude group: 'com.google.android'
+    }
+    testCompile 'com.google.guava:guava-jdk5:17.0'
+    testCompile 'org.mockito:mockito-all:1.9.5'
 }

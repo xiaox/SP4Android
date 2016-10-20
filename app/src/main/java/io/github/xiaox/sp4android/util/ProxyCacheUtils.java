@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 public class ProxyCacheUtils {
 
     static final String LOG_TAG = "ProxyCache";
+
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
     public static final int MAX_ARRAY_PREVIEW = 16;
 
