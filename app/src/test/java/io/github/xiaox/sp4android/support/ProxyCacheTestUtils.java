@@ -11,10 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Random;
 import java.util.UUID;
 
 import io.github.xiaox.sp4android.exception.ProxyCacheException;
+import io.github.xiaox.sp4android.server.HttpProxyCacheServer;
 import io.github.xiaox.sp4android.source.ByteArraySource;
 import io.github.xiaox.sp4android.source.HttpUrlSource;
 import io.github.xiaox.sp4android.source.Source;
@@ -43,12 +46,33 @@ public class ProxyCacheTestUtils {
     public static final int HTTP_DATA_SIZE = 4768;
     public static final int HTTP_DATA_BIG_SIZE = 94363;
 
+    public static Response readProxyResponse(HttpProxyCacheServer proxy, String url) throws IOException {
+        return readProxyResponse(proxy, url, -1);
+    }
+
+    public static Response readProxyResponse(HttpProxyCacheServer proxy, String url, int offset) throws IOException {
+        String proxyUrl = proxy.getProxyUrl(url, false);
+        if (!proxyUrl.startsWith("http://127.0.0.1")) {
+            throw new IllegalStateException("Proxy url" + proxyUrl + " is not proxied");
+        }
+        URL proxiedUrl = new URL(proxyUrl);
+        HttpURLConnection connection = (HttpURLConnection) proxiedUrl.openConnection();
+        try {
+            if (offset > 0) {
+                connection.setRequestProperty("Range", "bytes=" + offset + "-");
+            }
+            return new Response(connection);
+        } finally {
+            connection.disconnect();
+        }
+    }
+
     public static byte[] loadTestData() throws IOException {
         return loadAssetFile(ASSETS_DATA_NAME);
     }
 
     public static byte[] loadAssetFile(String name) throws IOException {
-        InputStream in = RuntimeEnvironment.application.getResources().getAssets().open(name);
+        InputStream in = RuntimeEnvironment.application.getAssets().open(name);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         IoUtils.copy(in, out);
         IoUtils.closeSilently(in);
